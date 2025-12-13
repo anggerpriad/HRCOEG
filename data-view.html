@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HRCOEG - Data Excel View</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Excel-like Styles - IMPROVED FOR SMOOTH VIEWING */
+    .excel-toolbar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .excel-container {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    /* Smooth scrollbar styling */
+    .excel-container::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    .excel-container::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    .excel-container::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 5px;
+    }
+
+    .excel-container::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+
+    .excel-sheet {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 14px;
+      table-layout: fixed;
+    }
+
+    .excel-sheet th {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 8px;
+      border: 1px solid #5a5fa8;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      text-align: left;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .excel-sheet th:hover {
+      background: linear-gradient(135deg, #5568d3 0%, #6a4a96 100%);
+    }
+
+    .excel-sheet td {
+      padding: 10px 8px;
+      border: 1px solid #e0e0e0;
+      background: white;
+      min-width: 80px;
+    }
+
+    .excel-sheet tbody tr {
+      transition: background-color 0.15s ease;
+    }
+
+    .excel-sheet tbody tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    .excel-sheet tbody tr:hover {
+      background: #e8f4f8;
+      box-shadow: inset 0 0 5px rgba(102, 126, 234, 0.1);
+    }
+
+    .excel-sheet input[type="text"],
+    .excel-sheet input[type="email"],
+    .excel-sheet select {
+      width: 100%;
+      padding: 6px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      font-size: 13px;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+
+    .excel-sheet input[type="text"]:hover,
+    .excel-sheet input[type="email"]:hover,
+    .excel-sheet select:hover {
+      border-color: #bbb;
+      background: #fafafa;
+    }
+
+    .excel-sheet input:focus,
+    .excel-sheet select:focus {
+      outline: none;
+      border-color: #667eea;
+      background: #fffef0;
+      box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+    }
+
+    .row-number {
+      background: #f5f5f5;
+      border: 1px solid #d0d0d0;
+      text-align: center;
+      font-weight: 600;
+      color: #666;
+      width: 40px;
+      min-width: 40px;
+      user-select: none;
+      font-size: 13px;
+    }
+
+    .action-cell {
+      text-align: center;
+      padding: 6px 4px !important;
+      min-width: 70px;
+    }
+
+    .action-cell button {
+      padding: 5px 10px;
+      margin: 2px;
+      font-size: 12px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-delete-row {
+      background: #ff5252;
+      color: white;
+    }
+
+    .btn-delete-row:hover {
+      background: #ff1744;
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(255, 23, 68, 0.3);
+    }
+
+    .btn-detail {
+      padding: 5px 10px;
+      margin: 2px;
+      font-size: 12px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-detail:hover {
+      background: #5568d3;
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    .filter-section {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-input {
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+      transition: border-color 0.2s ease;
+    }
+
+    .filter-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 5px rgba(102, 126, 234, 0.2);
+    }
+
+    .stats-bar {
+      background: linear-gradient(135deg, #f5f7fa 0%, #f0f4f8 100%);
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      border-left: 4px solid #667eea;
+    }
+
+    .stat-item {
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .stat-label {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .stat-value {
+      color: #667eea;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      overflow-y: auto;
+    }
+
+    .modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      width: 90%;
+      max-width: 700px;
+      max-height: 80vh;
+      overflow-y: auto;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 1rem;
+    }
+
+    .modal-header h2 {
+      color: #667eea;
+      margin: 0;
+    }
+
+    .modal-close {
+      font-size: 28px;
+      font-weight: bold;
+      color: #999;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      color: #667eea;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .detail-field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .detail-label {
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .detail-value {
+      color: #333;
+      padding: 0.75rem;
+      background: #f8f9fa;
+      border-radius: 4px;
+      border-left: 3px solid #667eea;
+      word-break: break-word;
+    }
+
+    .detail-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      justify-content: flex-end;
+      border-top: 1px solid #eee;
+      padding-top: 1rem;
+    }
+
+    .btn-modal {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-modal-close {
+      background: #ddd;
+      color: #333;
+    }
+
+    .btn-modal-close:hover {
+      background: #ccc;
+    }
+
+    .btn-modal-edit {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-modal-edit:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+  </style>
+    @media (max-width: 1024px) {
+      .excel-sheet {
+        font-size: 12px;
+      }
+
+      .excel-sheet td {
+        padding: 8px 6px;
+        min-width: 70px;
+      }
+
+      .excel-sheet input,
+      .excel-sheet select {
+        padding: 5px;
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .excel-container {
+        max-height: 500px;
+      }
+
+      .excel-sheet {
+        font-size: 11px;
+      }
+
+      .excel-sheet td {
+        padding: 6px 4px;
+        min-width: 60px;
+      }
+
+      .row-number {
+        width: 30px;
+        min-width: 30px;
+      }
+
+      .action-cell {
+        min-width: 60px;
+      }
+
+      .action-cell button {
+        padding: 4px 6px;
+        font-size: 10px;
+      }
+
+      .filter-section {
+        gap: 0.5rem;
+      }
+
+      .filter-input {
+        flex: 1;
+        min-width: 150px;
+      }
+
+      .stats-bar {
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="logo">HRCOEG</div>
+      <ul class="nav-links">
+        <li><a href="Index.html">Home</a></li>
+        <li><a href="#candidates">Candidates</a></li>
+        <li><a href="#jobs">Jobs</a></li>
+        <li><a href="Index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <section class="page-header">
+    <div class="container">
+      <h1>Data Management - Excel View</h1>
+      <p>View, edit, sort and filter data with Excel-like features</p>
+    </div>
+  </section>
+
+  <!-- Candidates Section -->
+  <section id="candidates" class="data-section">
+    <div class="container">
+      <h2>Candidates Database</h2>
+
+      <div class="excel-toolbar">
+        <button class="btn btn-primary" onclick="addCandidateRow()">+ Add Row</button>
+        <button class="btn btn-secondary" onclick="openTalentPoolFile()">📂 Load Talent Pool</button>
+        <button class="btn btn-secondary" onclick="exportToCSV('candidateTable', 'candidates.csv')">📥 Export CSV</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('candidateFile').click()">📤 Import CSV</button>
+        <input type="file" id="candidateFile" style="display:none;" accept=".csv" onchange="importCSV(event, 'candidateTable')">
+        <input type="file" id="talentPoolFile" style="display:none;" accept=".xlsx,.xls" onchange="loadExcelFile('talentPoolFile', 'candidateTable')">
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat-item"><span class="stat-label">Total Candidates:</span> <span id="candidateCount" class="stat-value">5</span></div>
+        <div class="stat-item"><span class="stat-label">Active:</span> <span id="candidateActive" class="stat-value">4</span></div>
+        <div class="stat-item"><span class="stat-label">Filters Applied:</span> <span id="candidateFiltered" class="stat-value">0</span></div>
+      </div>
+
+      <div class="filter-section">
+        <input type="text" class="filter-input" placeholder="Search name..." onkeyup="filterTable('candidateTable')">
+        <input type="text" class="filter-input" placeholder="Search skills..." onkeyup="filterTable('candidateTable')">
+        <select class="filter-input" onchange="filterTable('candidateTable')">
+          <option value="">All Status</option>
+          <option value="Active">Active</option>
+          <option value="Pending">Pending</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+
+      <div class="excel-container">
+        <table id="candidateTable" class="excel-sheet">
+          <thead>
+            <tr>
+              <th style="width: 40px; min-width: 40px;"></th>
+              <th style="width: 70px; min-width: 70px;" onclick="sortTable('candidateTable', 0)">ID ↕</th>
+              <th style="width: 120px; min-width: 120px;" onclick="sortTable('candidateTable', 1)">Name ↕</th>
+              <th style="width: 160px; min-width: 160px;" onclick="sortTable('candidateTable', 2)">Email ↕</th>
+              <th style="width: 150px; min-width: 150px;" onclick="sortTable('candidateTable', 3)">Skills ↕</th>
+              <th style="width: 100px; min-width: 100px;" onclick="sortTable('candidateTable', 4)">Status ↕</th>
+              <th style="width: 140px; min-width: 140px;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-number">1</td>
+              <td>C001</td>
+              <td><input type="text" value="John Smith" onchange="updateStats('candidateTable')"></td>
+              <td><input type="email" value="john@example.com"></td>
+              <td><input type="text" value="JavaScript, React"></td>
+              <td><select onchange="updateStats('candidateTable')"><option selected>Active</option><option>Pending</option><option>Inactive</option></select></td>
+              <td class="action-cell">
+                <button class="btn-detail" onclick="showCandidateDetail(this)">👁️ Details</button>
+                <button class="btn-delete-row" onclick="deleteRow(this)" style="margin-top: 2px;">Delete</button>
+              </td>
+            </tr>
+            <tr>
+              <td class="row-number">2</td>
+              <td>C002</td>
+              <td><input type="text" value="Sarah Johnson" onchange="updateStats('candidateTable')"></td>
+              <td><input type="email" value="sarah@example.com"></td>
+              <td><input type="text" value="Python, Django"></td>
+              <td><select onchange="updateStats('candidateTable')"><option selected>Active</option><option>Pending</option><option>Inactive</option></select></td>
+              <td class="action-cell"><button class="btn-delete-row" onclick="deleteRow(this)">Delete</button></td>
+            </tr>
+            <tr>
+              <td class="row-number">3</td>
+              <td>C003</td>
+              <td><input type="text" value="Michael Chen" onchange="updateStats('candidateTable')"></td>
+              <td><input type="email" value="michael@example.com"></td>
+              <td><input type="text" value="Java, Spring Boot"></td>
+              <td><select onchange="updateStats('candidateTable')"><option>Active</option><option selected>Pending</option><option>Inactive</option></select></td>
+              <td class="action-cell"><button class="btn-delete-row" onclick="deleteRow(this)">Delete</button></td>
+            </tr>
+            <tr>
+              <td class="row-number">4</td>
+              <td>C004</td>
+              <td><input type="text" value="Emily Davis" onchange="updateStats('candidateTable')"></td>
+              <td><input type="email" value="emily@example.com"></td>
+              <td><input type="text" value="UI/UX Design"></td>
+              <td><select onchange="updateStats('candidateTable')"><option selected>Active</option><option>Pending</option><option>Inactive</option></select></td>
+              <td class="action-cell"><button class="btn-delete-row" onclick="deleteRow(this)">Delete</button></td>
+            </tr>
+            <tr>
+              <td class="row-number">5</td>
+              <td>C005</td>
+              <td><input type="text" value="David Wilson" onchange="updateStats('candidateTable')"></td>
+              <td><input type="email" value="david@example.com"></td>
+              <td><input type="text" value="Data Science"></td>
+              <td><select onchange="updateStats('candidateTable')"><option>Active</option><option>Pending</option><option selected>Inactive</option></select></td>
+              <td class="action-cell"><button class="btn-delete-row" onclick="deleteRow(this)">Delete</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Jobs Section -->
+  <section id="jobs" class="data-section">
+    <div class="container">
+      <h2>Jobs Database</h2>
+
+      <div class="excel-toolbar">
+        <button class="btn btn-primary" onclick="addJobRow()">+ Add Row</button>
+        <button class="btn btn-secondary" onclick="exportToCSV('jobTable', 'jobs.csv')">📥 Export CSV</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('jobFile').click()">📤 Import CSV</button>
+        <input type="file" id="jobFile" style="display:none;" accept=".csv" onchange="importCSV(event, 'jobTable')">
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat-item"><span class="stat-label">Total Jobs:</span> <span id="jobCount" class="stat-value">5</span></div>
+        <div class="stat-item"><span class="stat-label">Open Positions:</span> <span id="jobOpen" class="stat-value">4</span></div>
+        <div class="stat-item"><span class="stat-label">Closed:</span> <span id="jobClosed" class="stat-value">1</span></div>
+      </div>
+
+      <div class="filter-section">
+        <input type="text" class="filter-input" placeholder="Search title..." onkeyup="filterTable('jobTable')">
+        <input type="text" class="filter-input" placeholder="Search company..." onkeyup="filterTable('jobTable')">
+        <select class="filter-input" onchange="filterTable('jobTable')">
+          <option value="">All Status</option>
+          <option value="Open">Open</option>
+          <option value="Closed">Closed</option>
+        </select>
+      </div>
+
+      <div class="excel-container">
+        <table id="jobTable" class="excel-sheet">
+          <thead>
+            <tr>
+              <th style="width: 40px; min-width: 40px;"></th>
+              <th style="width: 70px; min-width: 70px;" onclick="sortTable('jobTable', 0)">ID ↕</th>
+              <th style="width: 150px; min-width: 150px;" onclick="sortTable('jobTable', 1)">Title ↕</th>
+              <th style="width: 130px; min-width: 130px;" onclick="sortTable('jobTable', 2)">Company ↕</th>
+              <th style="width: 130px; min-width: 130px;" onclick="sortTable('jobTable', 3)">Location ↕</th>
+              <th style="width: 110px; min-width: 110px;" onclick="sortTable('jobTable', 4)">Posted ↕</th>
+              <th style="width: 100px; min-width: 100px;" onclick="sortTable('jobTable', 5)">Status ↕</th>
+              <th style="width: 70px; min-width: 70px;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-number">1</td>
+              <td>J001</td>
+              <td><input type="text" value="Senior Frontend Developer"></td>
+              <td><input type="text" value="Tech Corp"></td>
+              <td><input type="text" value="New York, NY"></td>
+              <td><input type="text" value="2025-11-15"></td>
+              <td><select onchange="updateStats('jobTable')"><option selected>Open</option><option>Closed</option></select></td>
+              <td class="action-cell"><button class="btn-delete-row" onclick="deleteRow(this)">Delete</button></td>
+            </tr>
+            <tr>
+              <td class="row-number">2</td>
+              <td>J002</td>
+              <td><input type="text" value="Backend Engineer"></td>
+              <td><input type="text" value="Cloud Solutions"></td>
+              <td><input type="text" value="San Francisco, CA"></td>
+              <td><input type="text" value="2025-11-10"></td>
+              <td><select onchange="updateStats('jobTable')"><option selected>Open</option><option>Closed</option></select></td>
+              <td class="action-cell"><button class="btn-delete-row" onclick="deleteRow(this)">Delete</button></td>
+            </tr>
+            <tr>
+              <td class="row-number">3</td>
+              <td>J003</td>
+              <td><input type="text" value="Product Manager"></td>
+              <td><input type="text" value="StartUp Inc"></td>
+              <td><input type="text" value="Remote"></td>
+              <td><input type="text" value="2025-11-01"></td>
+              <td><select onchange="updateStats('jobTable')"><option>Open</option><option selected>Closed</option></select></td>
+              <td class="action-cell"><button class="btn-delete-row" onclick="deleteRow(this)">Delete</button></td>
+            </tr>
+            <tr>
+              <td class="row-number">4</td>
+              <td>J004</td>
+              <td><input type="text" value="UI/UX Designer"></td>
+              <td><input type="text" value="Design Studio"></td>
+              <td><input type="text" value="Los Angeles, CA"></td>
+              <td><input type="text" value="2025-11-20"></td>
+              <td><select onchange="updateStats('jobTable')"><option selected>Open</option><option>Closed</option></select></td>
+              <td class="action-cell"><button class="btn-delete-row" onclick="deleteRow(this)">Delete</button></td>
+            </tr>
+            <tr>
+              <td class="row-number">5</td>
+              <td>J005</td>
+              <td><input type="text" value="Data Scientist"></td>
+              <td><input type="text" value="Analytics Pro"></td>
+              <td><input type="text" value="Boston, MA"></td>
+              <td><input type="text" value="2025-11-05"></td>
+              <td><select onchange="updateStats('jobTable')"><option selected>Open</option><option>Closed</option></select></td>
+              <td class="action-cell"><button class="btn-delete-row" onclick="deleteRow(this)">Delete</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Detail Modal -->
+  <div id="detailModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Candidate Details</h2>
+        <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+      </div>
+      <div id="detailGrid" class="detail-grid">
+        <!-- Detail fields will be populated here -->
+      </div>
+      <div class="detail-actions">
+        <button class="btn-modal btn-modal-edit" onclick="editCandidate()">✏️ Edit</button>
+        <button class="btn-modal btn-modal-close" onclick="closeDetailModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 HRCOEG. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- XLSX Library - Multiple CDN options for reliability -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="script.js"></script>
+  <script>
+    // Wait for XLSX library to load
+    function waitForXLSX(callback) {
+      if (typeof XLSX !== 'undefined') {
+        callback();
+      } else {
+        setTimeout(() => waitForXLSX(callback), 100);
+      }
+    }
+
+    // Trigger file picker for Load Talent Pool button
+    function openTalentPoolFile() {
+      document.getElementById('talentPoolFile').click();
+    }
+
+    // Load Excel file directly
+    function loadExcelFile(inputId, tableId) {
+      const fileInput = document.getElementById(inputId);
+      if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+        return;
+      }
+      const file = fileInput.files[0];
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          // Wait for XLSX to be available
+          if (typeof XLSX === 'undefined') {
+            setTimeout(() => loadExcelFile(inputId, tableId), 200);
+            return;
+          }
+          
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          
+          if (!workbook || !workbook.SheetNames || workbook.SheetNames.length === 0) {
+            throw new Error('No sheets found in Excel file');
+          }
+          
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(firstSheet);
+          
+          if (rows.length === 0) {
+            alert('No data found in Excel file');
+            return;
+          }
+          
+          const table = document.getElementById(tableId);
+          const tbody = table.querySelector('tbody');
+          
+          tbody.innerHTML = '';
+          rows.forEach((row, index) => {
+            const newRow = tbody.insertRow();
+            const cells = Object.values(row);
+            
+            let cellsHTML = `<td class="row-number">${index + 1}</td>`;
+            cells.forEach((value, idx) => {
+              const cellValue = value || '';
+              cellsHTML += `<td><input type="text" value="${String(cellValue).replace(/"/g, '&quot;')}"></td>`;
+            });
+            cellsHTML += `<td class="action-cell"><button class="btn-delete-row" onclick="deleteRow(this)">Delete</button></td>`;
+            
+            newRow.innerHTML = cellsHTML;
+          });
+          
+          alert(`Successfully loaded ${rows.length} rows from Excel`);
+          updateStats(tableId);
+          
+          // Reset file input
+          fileInput.value = '';
+        } catch(err) {
+          alert('Error reading Excel file: ' + err.message);
+          console.error(err);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    // Sort table by column
+    function sortTable(tableId, columnIndex) {
+      const table = document.getElementById(tableId);
+      const tbody = table.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+
+      rows.sort((a, b) => {
+        const aValue = a.cells[columnIndex + 1]?.textContent || '';
+        const bValue = b.cells[columnIndex + 1]?.textContent || '';
+        return aValue.localeCompare(bValue);
+      });
+
+      tbody.innerHTML = '';
+      rows.forEach((row, index) => {
+        row.querySelector('.row-number').textContent = index + 1;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Filter table
+    function filterTable(tableId) {
+      const table = document.getElementById(tableId);
+      const rows = table.querySelectorAll('tbody tr');
+      const filters = table.parentElement.querySelectorAll('.filter-input');
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+        let match = true;
+        filters.forEach((filter, index) => {
+          if (filter.value && !row.cells[index + 1]?.textContent.toUpperCase().includes(filter.value.toUpperCase())) {
+            match = false;
+          }
+        });
+        row.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+      });
+
+      updateStats(tableId);
+    }
+
+    // Add row to table
+    function addCandidateRow() {
+      const table = document.getElementById('candidateTable');
+      const tbody = table.querySelector('tbody');
+      const newRow = tbody.insertRow();
+      const rowNum = tbody.rows.length;
+
+      newRow.innerHTML = `
+        <td class="row-number">${rowNum}</td>
+        <td><input type="text" value="C${String(rowNum).padStart(3, '0')}"></td>
+        <td><input type="text" placeholder="Name" onchange="updateStats('candidateTable')"></td>
+        <td><input type="email" placeholder="Email"></td>
+        <td><input type="text" placeholder="Skills"></td>
+        <td><select onchange="updateStats('candidateTable')"><option>Active</option><option>Pending</option><option>Inactive</option></select></td>
+        <td class="action-cell">
+          <button class="btn-detail" onclick="showCandidateDetail(this)">👁️ Details</button>
+          <button class="btn-delete-row" onclick="deleteRow(this)" style="margin-top: 2px;">Delete</button>
+        </td>
+      `;
+      updateStats('candidateTable');
+    }
+
+    function addJobRow() {
+      const table = document.getElementById('jobTable');
+      const tbody = table.querySelector('tbody');
+      const newRow = tbody.insertRow();
+      const rowNum = tbody.rows.length;
+
+      newRow.innerHTML = `
+        <td class="row-number">${rowNum}</td>
+        <td><input type="text" value="J${String(rowNum).padStart(3, '0')}"></td>
+        <td><input type="text" placeholder="Job Title"></td>
+        <td><input type="text" placeholder="Company"></td>
+        <td><input type="text" placeholder="Location"></td>
+        <td><input type="text" placeholder="Date"></td>
+        <td><select onchange="updateStats('jobTable')"><option>Open</option><option>Closed</option></select></td>
+        <td class="action-cell"><button class="btn-delete-row" onclick="deleteRow(this)">Delete</button></td>
+      `;
+      updateStats('jobTable');
+    }
+
+    // Delete row
+    function deleteRow(btn) {
+      btn.closest('tr').remove();
+      updateStats(btn.closest('table').id);
+    }
+
+    // Update statistics
+    function updateStats(tableId) {
+      const table = document.getElementById(tableId);
+      const rows = table.querySelectorAll('tbody tr:not([style*="display: none"])');
+      
+      if (tableId === 'candidateTable') {
+        document.getElementById('candidateCount').textContent = rows.length;
+        const activeCount = Array.from(rows).filter(r => r.cells[5]?.textContent.includes('Active')).length;
+        document.getElementById('candidateActive').textContent = activeCount;
+      } else if (tableId === 'jobTable') {
+        document.getElementById('jobCount').textContent = rows.length;
+        const openCount = Array.from(rows).filter(r => r.cells[6]?.textContent.includes('Open')).length;
+        document.getElementById('jobOpen').textContent = openCount;
+        document.getElementById('jobClosed').textContent = rows.length - openCount;
+      }
+    }
+
+    // Export to CSV
+    function exportToCSV(tableId, filename) {
+      const table = document.getElementById(tableId);
+      let csv = '';
+      
+      table.querySelectorAll('tr').forEach(row => {
+        const cells = [];
+        row.querySelectorAll('th, td').forEach((cell, index) => {
+          if (index === 0) return;
+          const input = cell.querySelector('input, select');
+          cells.push('"' + (input?.value || cell.textContent).replace(/"/g, '""') + '"');
+        });
+        csv += cells.join(',') + '\n';
+      });
+
+      const link = document.createElement('a');
+      link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+      link.download = filename;
+      link.click();
+    }
+
+    // Import CSV
+    function importCSV(event, tableId) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const csv = e.target.result;
+        const rows = csv.split('\n').filter(row => row.trim());
+        const table = document.getElementById(tableId);
+        const tbody = table.querySelector('tbody');
+        
+        tbody.innerHTML = '';
+        rows.slice(1).forEach((row, index) => {
+          if (!row.trim()) return;
+          const cells = row.split(',').map(cell => cell.replace(/"/g, ''));
+          const newRow = tbody.insertRow();
+          newRow.innerHTML = `
+            <td class="row-number">${index + 1}</td>
+            ${cells.map((cell, idx) => {
+              if (idx === cells.length - 1) {
+                return `<td class="action-cell"><button class="btn-delete-row" onclick="deleteRow(this)">Delete</button></td>`;
+              }
+              return `<td><input type="text" value="${cell}"></td>`;
+            }).join('')}
+          `;
+        });
+        updateStats(tableId);
+      };
+      reader.readAsText(file);
+    }
+
+    // Initialize stats
+    document.addEventListener('DOMContentLoaded', () => {
+      updateStats('candidateTable');
+      updateStats('jobTable');
+    });
+
+    // Modal Functions
+    function showCandidateDetail(button) {
+      const row = button.closest('tr');
+      const cells = row.querySelectorAll('td');
+      
+      // Get all input values from the row
+      const id = cells[1].textContent.trim();
+      const name = cells[2].querySelector('input')?.value || '';
+      const email = cells[3].querySelector('input')?.value || '';
+      const skills = cells[4].querySelector('input')?.value || '';
+      const status = cells[5].querySelector('select')?.value || '';
+      
+      // Create detail view
+      const detailGrid = document.getElementById('detailGrid');
+      detailGrid.innerHTML = `
+        <div class="detail-field">
+          <div class="detail-label">ID</div>
+          <div class="detail-value">${id}</div>
+        </div>
+        <div class="detail-field">
+          <div class="detail-label">Name</div>
+          <div class="detail-value">${name}</div>
+        </div>
+        <div class="detail-field">
+          <div class="detail-label">Email</div>
+          <div class="detail-value">${email}</div>
+        </div>
+        <div class="detail-field">
+          <div class="detail-label">Skills</div>
+          <div class="detail-value">${skills}</div>
+        </div>
+        <div class="detail-field">
+          <div class="detail-label">Status</div>
+          <div class="detail-value">${status}</div>
+        </div>
+        <div class="detail-field">
+          <div class="detail-label">Additional Info</div>
+          <div class="detail-value">Age, Gender, Salary, and other details can be added here when loading from Excel</div>
+        </div>
+      `;
+      
+      openDetailModal();
+    }
+
+    function openDetailModal() {
+      const modal = document.getElementById('detailModal');
+      modal.classList.add('show');
+    }
+
+    function closeDetailModal() {
+      const modal = document.getElementById('detailModal');
+      modal.classList.remove('show');
+    }
+
+    function editCandidate() {
+      alert('Edit mode coming soon! You can edit data directly in the table.');
+      closeDetailModal();
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+      const modal = document.getElementById('detailModal');
+      if (event.target === modal) {
+        closeDetailModal();
+      }
+    }
+  </script>
+</body>
+</html>
