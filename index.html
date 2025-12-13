@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HRCOEG - Connecting Talent & Opportunity</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="logo">HRCOEG</div>
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="container">
+      <h1>HRCOEG</h1>
+      <p class="tagline">Connecting Fresh Graduates & Qualified Talent to Companies</p>
+      <div class="cta-buttons">
+        <button class="btn btn-primary" onclick="scrollToSection('features')">Get Started</button>
+        <button class="btn btn-secondary" onclick="scrollToSection('about')">Learn More</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="about">
+    <div class="container">
+      <h2>About HRCOEG</h2>
+      <p>We bridge the gap between fresh graduates and companies looking for qualified talent. Our platform connects the right people with the right opportunities.</p>
+      <div class="about-grid">
+        <div class="about-card">
+          <h3>For Job Seekers</h3>
+          <p>Find your dream job and launch your career with the right company.</p>
+        </div>
+        <div class="about-card">
+          <h3>For Companies</h3>
+          <p>Discover talented fresh graduates ready to contribute to your team.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="features">
+    <div class="container">
+      <h2>Features</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>🎯 Smart Matching</h3>
+          <p>AI-powered matching between candidates and job opportunities.</p>
+        </div>
+        <div class="feature-card">
+          <h3>📱 Easy to Use</h3>
+          <p>Simple, intuitive interface designed for everyone.</p>
+        </div>
+        <div class="feature-card">
+          <h3>🚀 Fast Deployment</h3>
+          <p>Get matched with opportunities quickly.</p>
+        </div>
+        <div class="feature-card">
+          <h3>💼 Professional Network</h3>
+          <p>Build connections with industry professionals.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="contact">
+    <div class="container">
+      <h2>Get In Touch</h2>
+      <form class="contact-form" onsubmit="handleContactSubmit(event)">
+        <input type="text" placeholder="Your Name" required>
+        <input type="email" placeholder="Your Email" required>
+        <textarea placeholder="Your Message" rows="5" required></textarea>
+        <button type="submit" class="btn btn-primary">Send Message</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 HRCOEG. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
