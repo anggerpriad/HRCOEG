@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Career Readlines — Tes DISC & RIASEC</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root{--brand:#667eea;--muted:#666}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;margin:0;color:#222}
+    .container{max-width:980px;margin:40px auto;padding:20px}
+    h1{color:var(--brand);margin-bottom:10px}
+    .lead{color:var(--muted);margin-bottom:20px}
+    .card{background:#fff;border-radius:8px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,0.06);margin-bottom:16px}
+    .grid{display:grid;gap:12px}
+    .btn{background:var(--brand);color:#fff;padding:10px 14px;border-radius:6px;border:none;cursor:pointer}
+    .btn.secondary{background:#ddd;color:#333}
+    .question{margin:8px 0;padding:8px;border-radius:6px;background:#fafafa}
+    label{display:block;margin-bottom:6px}
+    .score-box{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .score-item{background:#f5f7ff;border-left:4px solid var(--brand);padding:10px;border-radius:6px;min-width:150px}
+    .result-section{margin-top:18px}
+    .career-list{list-style:none;padding-left:0}
+    .career-list li{padding:8px 10px;border-radius:6px;margin-bottom:8px;background:#fff}
+    .small{font-size:0.9rem;color:#555}
+    .center{display:flex;gap:10px;align-items:center}
+    @media (max-width:600px){.container{padding:12px}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="Index.html" class="small">← Kembali ke Beranda</a>
+    <h1>Career Readlines</h1>
+    <p class="lead">Ikuti tes psikologi singkat DISC dan RIASEC untuk mendapatkan interpretasi kepribadian karir dan rekomendasi konseling karir.</p>
+
+    <div class="card">
+      <h3>Petunjuk</h3>
+      <p class="small">Jawablah jujur. Setiap tes memiliki beberapa pernyataan; berikan penilaian pada skala 1 (tidak sesuai) sampai 5 (sangat sesuai). Hasil akan menampilkan interpretasi untuk skor dominan dan daftar opsi konseling karir yang direkomendasikan.</p>
+    </div>
+
+    <form id="careerForm">
+      <div class="card">
+        <h3>Bagian A — Tes DISC (12 pertanyaan)</h3>
+        <div class="grid" id="discQuestions">
+          <!-- DISC questions inserted by JS -->
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Bagian B — Tes RIASEC (12 pertanyaan)</h3>
+        <div class="grid" id="riasecQuestions">
+          <!-- RIASEC questions inserted by JS -->
+        </div>
+      </div>
+
+      <div class="center" style="margin-top:12px">
+        <button type="button" class="btn" onclick="submitTests()">Lihat Interpretasi & Rekomendasi</button>
+        <button type="reset" class="btn secondary" onclick="clearResults()">Reset</button>
+      </div>
+    </form>
+
+    <div id="results" class="result-section"></div>
+  </div>
+
+  <script>
+    // Minimal question sets and category mappings
+    const discQuestions = [
+      {id:'D1',text:'Saya nyaman mengambil keputusan cepat dan memimpin tim.' ,cat:'D'},
+      {id:'D2',text:'Saya fokus pada target dan hasil.' ,cat:'D'},
+      {id:'I1',text:'Saya suka berinteraksi dan memotivasi orang lain.' ,cat:'I'},
+      {id:'I2',text:'Saya mudah bergaul dan pandai membangun jaringan.' ,cat:'I'},
+      {id:'S1',text:'Saya sabar, tenang, dan konsisten dalam pekerjaan.' ,cat:'S'},
+      {id:'S2',text:'Saya menjaga hubungan baik dengan rekan kerja.' ,cat:'S'},
+      {id:'C1',text:'Saya teliti, tertib, dan menghargai proses yang benar.' ,cat:'C'},
+      {id:'C2',text:'Saya mengutamakan kualitas dan standar kerja.' ,cat:'C'},
+      {id:'D3',text:'Saya berani mengambil risiko bila perlu.' ,cat:'D'},
+      {id:'I3',text:'Saya pandai menjual ide dan persuasif.' ,cat:'I'},
+      {id:'S3',text:'Saya nyaman membantu dan mendukung orang lain.' ,cat:'S'},
+      {id:'C3',text:'Saya suka menganalisa data dan fakta sebelum membuat keputusan.' ,cat:'C'}
+    ];
+
+    const riasecQuestions = [
+      {id:'R',text:'Saya suka memecahkan masalah teknis atau ilmiah.' ,cat:'R'},
+      {id:'I',text:'Saya menikmati pekerjaan yang berpacu pada ide dan kreativitas.' ,cat:'I'},
+      {id:'A',text:'Saya tertarik pada seni, desain, atau ekspresi kreatif.' ,cat:'A'},
+      {id:'S',text:'Saya senang membantu orang secara langsung.' ,cat:'S'},
+      {id:'E',text:'Saya suka bekerja untuk mencapai tujuan bisnis atau manajemen.' ,cat:'E'},
+      {id:'C',text:'Saya tertarik pada tugas yang terstruktur dan administratif.' ,cat:'C'},
+      {id:'R2',text:'Saya suka bekerja dengan alat, mesin, atau teknologi.' ,cat:'R'},
+      {id:'I2',text:'Saya senang melakukan penelitian dan analisis konsep.' ,cat:'I'},
+      {id:'A2',text:'Saya suka mencipta karya seni atau produk yang unik.' ,cat:'A'},
+      {id:'S2',text:'Saya peduli dengan kesejahteraan orang dan layanan sosial.' ,cat:'S'},
+      {id:'E2',text:'Saya nyaman memimpin dan mengambil keputusan bisnis.' ,cat:'E'},
+      {id:'C2',text:'Saya menikmati mengorganisir, mengatur data, dan aturan.' ,cat:'C'}
+    ];
+
+    function createScaleHtml(name){
+      let html = '';
+      for(let i=1;i<=5;i++){
+        html += `<label><input type="radio" name="${name}" value="${i}" required> ${i}</label> `;
+      }
+      return html;
+    }
+
+    function renderQuestions(){
+      const disc = document.getElementById('discQuestions');
+      discQuestions.forEach((q,idx)=>{
+        const div = document.createElement('div');
+        div.className='question';
+        div.innerHTML = `<label><strong>${idx+1}.</strong> ${q.text}</label><div>${createScaleHtml('disc_'+q.id)}</div>`;
+        disc.appendChild(div);
+      });
+
+      const ria = document.getElementById('riasecQuestions');
+      riasecQuestions.forEach((q,idx)=>{
+        const div = document.createElement('div');
+        div.className='question';
+        div.innerHTML = `<label><strong>${idx+1}.</strong> ${q.text}</label><div>${createScaleHtml('ria_'+idx)}</div>`;
+        ria.appendChild(div);
+      });
+    }
+
+    renderQuestions();
+
+    function submitTests(){
+      // Gather DISC scores
+      const discScores = {D:0,I:0,S:0,C:0};
+      discQuestions.forEach(q=>{
+        const val = Number(document.querySelector(`input[name="disc_${q.id}"]:checked`)?.value || 0);
+        discScores[q.cat] += val;
+      });
+
+      // Gather RIASEC scores
+      const riasecScores = {R:0,I:0,A:0,S:0,E:0,C:0};
+      riasecQuestions.forEach((q,idx)=>{
+        const val = Number(document.querySelector(`input[name="ria_${idx}"]:checked`)?.value || 0);
+        riasecScores[q.cat] += val;
+      });
+
+      showResults(discScores, riasecScores);
+    }
+
+    function getTopCategories(scoresObj, topN=2){
+      const arr = Object.entries(scoresObj).sort((a,b)=>b[1]-a[1]);
+      return arr.slice(0,topN).map(x=>({cat:x[0],score:x[1]}));
+    }
+
+    function showResults(disc, riasec){
+      const results = document.getElementById('results');
+      results.innerHTML = '';
+
+      // DISC display
+      const discCard = document.createElement('div');
+      discCard.className='card';
+      discCard.innerHTML = `<h3>Hasil DISC</h3><p class="small">Skor singkat untuk gaya perilaku Anda</p>`;
+      const discScoresDiv = document.createElement('div');
+      discScoresDiv.className='score-box';
+      for(const k of ['D','I','S','C']){
+        const si = document.createElement('div'); si.className='score-item'; si.innerHTML=`<strong>${k}</strong><div class="small">${disc[k]} poin</div>`;
+        discScoresDiv.appendChild(si);
+      }
+      discCard.appendChild(discScoresDiv);
+
+      const topDisc = getTopCategories(disc,2);
+      const discInterp = document.createElement('div');
+      discInterp.innerHTML = `<h4>Interpretasi Singkat</h4><p class="small">Dominan: ${topDisc.map(t=>t.cat+" ("+t.score+" pts)").join(', ')}</p>`;
+
+      // Add more descriptive text
+      discInterp.innerHTML += `<div class="small">${describeDISC(topDisc[0].cat)}</div>`;
+      discCard.appendChild(discInterp);
+
+      // RIASEC display
+      const riaCard = document.createElement('div');
+      riaCard.className='card';
+      riaCard.innerHTML = `<h3>Hasil RIASEC</h3><p class="small">Skor minat pekerjaan Anda berdasarkan tipe RIASEC</p>`;
+      const riaScoresDiv = document.createElement('div');
+      riaScoresDiv.className='score-box';
+      for(const k of ['R','I','A','S','E','C']){
+        const si = document.createElement('div'); si.className='score-item'; si.innerHTML=`<strong>${k}</strong><div class="small">${riasec[k]} poin</div>`;
+        riaScoresDiv.appendChild(si);
+      }
+      riaCard.appendChild(riaScoresDiv);
+
+      const topRia = getTopCategories(riasec,2);
+      const riaInterp = document.createElement('div');
+      riaInterp.innerHTML = `<h4>Interpretasi Singkat</h4><p class="small">Dominan: ${topRia.map(t=>t.cat+" ("+t.score+" pts)").join(', ')}</p>`;
+      riaInterp.innerHTML += `<div class="small">${describeRIASEC(topRia)}</div>`;
+      riaCard.appendChild(riaInterp);
+
+      // Counseling recommendations
+      const counselCard = document.createElement('div');
+      counselCard.className='card';
+      counselCard.innerHTML = `<h3>Rekomendasi Konseling Karir</h3><p class="small">Opsi yang cocok berdasarkan hasil tes Anda</p>`;
+
+      const list = document.createElement('ul'); list.className='career-list';
+      const recs = generateCounselingOptions(topDisc, topRia);
+      recs.forEach(r=>{
+        const li = document.createElement('li'); li.innerHTML = `<strong>${r.title}</strong><div class="small">${r.desc}</div>`; list.appendChild(li);
+      });
+      counselCard.appendChild(list);
+
+      // Action buttons
+      const actionDiv = document.createElement('div'); actionDiv.className='center';
+      const btnContact = document.createElement('button'); btnContact.className='btn'; btnContact.textContent='Minta Konseling';
+      btnContact.onclick = ()=>{ openContactModal(recs); };
+      const btnSave = document.createElement('button'); btnSave.className='btn secondary'; btnSave.textContent='Simpan Hasil (JSON)';
+      btnSave.onclick = ()=>{ downloadResultsAsJSON(disc,riasec); };
+      actionDiv.appendChild(btnContact); actionDiv.appendChild(btnSave);
+
+      // Append everything
+      results.appendChild(discCard);
+      results.appendChild(riaCard);
+      results.appendChild(counselCard);
+      results.appendChild(actionDiv);
+    }
+
+    function describeDISC(cat){
+      const map = {
+        D: 'Dominan (D): Cenderung tegas, bertindak cepat, berorientasi hasil. Cocok untuk peran kepemimpinan berfokus target.',
+        I: 'Influence (I): Sosial, persuasif, mudah bergaul. Cocok untuk peran penjualan, pemasaran, hubungan masyarakat.',
+        S: 'Steadiness (S): Stabil, suportif, kooperatif. Cocok untuk peran layanan, HR, dan tim yang membutuhkan konsistensi.',
+        C: 'Conscientious (C): Teliti, analitis, teratur. Cocok untuk peran teknis, keuangan, kualitas, riset.'
+      };
+      return map[cat] || '';
+    }
+
+    function describeRIASEC(topRia){
+      // topRia is array of two {cat,score}
+      const descriptions = {
+        R:'Realistic: pekerjaan teknis, mekanikal, teknik, IT, engineering.',
+        I:'Investigative: penelitian, analisis, ilmiah, data.',
+        A:'Artistic: desain, seni, kreatif, media.',
+        S:'Social: layanan sosial, konseling, pendidikan, perawatan.',
+        E:'Enterprising: bisnis, manajemen, entrepreneurship, penjualan.',
+        C:'Conventional: administrasi, akuntansi, sistem yang terstruktur.'
+      };
+      return `Dominasi ${topRia.map(t=>t.cat).join(' & ')} — ${descriptions[topRia[0].cat] || ''}`;
+    }
+
+    function generateCounselingOptions(topDisc, topRia){
+      const options = [];
+      // Based on DISC dominant
+      const d = topDisc[0].cat;
+      if(d==='D') options.push({title:'Konseling Kepemimpinan & Pengembangan Karir', desc:'Coaching untuk kemampuan memimpin, pengambilan keputusan, dan strategi karir ke posisi manajerial.'});
+      if(d==='I') options.push({title:'Konseling Karir Komunikasi & Personal Branding', desc:'Sesi untuk meningkatkan kemampuan presentasi, networking, dan peran customer-facing.'});
+      if(d==='S') options.push({title:'Konseling Stabilitas Karir & Keseimbangan', desc:'Bantuan memilih peran yang memberi rutinitas dan lingkungan mendukung.'});
+      if(d==='C') options.push({title:'Konseling Teknis & Pengembangan Kompetensi', desc:'Rencana pengembangan skill teknis, sertifikasi, dan peningkatan kualitas kerja.'});
+
+      // Based on RIASEC top
+      const r0 = topRia[0].cat;
+      const r1 = topRia[1].cat;
+      const pair = r0 + r1;
+      // simple mapping examples
+      if(r0==='R' || r1==='R') options.push({title:'Program Skill Teknologi/Engineering', desc:'Rekomendasi kursus teknis, bootcamp, dan mentor bidang teknologi.'});
+      if(r0==='A' || r1==='A') options.push({title:'Portfolio & Mentoring Kreatif', desc:'Bimbingan membuat portofolio, peluang freelancing, dan koneksi industri kreatif.'});
+      if(r0==='E' || r1==='E') options.push({title:'Pelatihan Bisnis & Entrepreneurship', desc:'Workshop bisnis, pitching, dan pengembangan peluang usaha/leadership.'});
+      if(r0==='S' || r1==='S') options.push({title:'Konseling Pekerjaan Sosial & Pendidikan', desc:'Panduan karir di layanan publik, NGO, pendidikan, dan kesehatan.'});
+      if(r0==='C' || r1==='C') options.push({title:'Kursus Administrasi & Sistem', desc:'Pelatihan software produktivitas, akuntansi, dan manajemen data.'});
+      if(r0==='I' || r1==='I') options.push({title:'Riset & Data Science Track', desc:'Saran studi lanjut, kursus statistik/data, dan peluang riset.'});
+
+      // ensure uniqueness and limit to 6
+      const seen = new Set();
+      const uniques = [];
+      for(const o of options){
+        if(!seen.has(o.title)) { seen.add(o.title); uniques.push(o); }
+        if(uniques.length>=6) break;
+      }
+      return uniques;
+    }
+
+    function openContactModal(recs){
+      // Lightweight: open mailto with subject and body containing top recommendations
+      const subject = encodeURIComponent('Permintaan Konseling Karir — Career Readlines');
+      let body = 'Halo,%0D%0A%0D%0ASaya ingin jadwalkan sesi konseling karir. Hasil rekomendasi: %0D%0A%0D%0A';
+      recs.forEach(r=>{ body += '- ' + r.title + ': ' + r.desc + '%0D%0A'; });
+      body += '%0D%0ASilakan hubungi saya untuk jadwal.%0D%0A';
+      window.location.href = `mailto:hrcoeg@example.com?subject=${subject}&body=${body}`;
+    }
+
+    function downloadResultsAsJSON(disc, riasec){
+      const payload = {timestamp:new Date().toISOString(),disc,riasec};
+      const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'career-readlines-result.json'; a.click(); URL.revokeObjectURL(url);
+    }
+
+    function clearResults(){
+      document.getElementById('results').innerHTML = '';
+    }
+  </script>
+</body>
+</html>
