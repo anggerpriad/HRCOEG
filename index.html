@@ -33,7 +33,81 @@
     </div>
   </section>
 
-  <!-- About Section -->
+  <!-- Features Section (updated to counseling services) -->
+  <section id="features" class="features">
+    <div class="container">
+      <h2>Features — Layanan Konseling Karier</h2>
+      <p class="lead">Layanan kami dirancang untuk membantu fresh graduates dan pencari kerja melalui serangkaian layanan konseling praktis.</p>
+
+      <div class="feature-grid">
+        <!-- Psikotes -->
+        <div class="feature-card">
+          <h3>🧠 Psikotes</h3>
+          <p>Menilai minat, bakat, dan kepribadian untuk merekomendasikan jalur karier dan pekerjaan yang sesuai.</p>
+          <ul>
+            <li>Assessment terstruktur (minat & kepribadian)</li>
+            <li>Hasil terperinci + rekomendasi karier</li>
+            <li>Report PDF & sesi pembahasan bersama konselor</li>
+          </ul>
+          <div class="feature-cta">
+            <button class="btn btn-primary" onclick="startAssessment()">Mulai Psikotes</button>
+            <button class="btn btn-secondary" onclick="bookDiscussion('psikotes')">Jadwalkan Pembahasan</button>
+          </div>
+        </div>
+
+        <!-- CV yang Fit -->
+        <div class="feature-card">
+          <h3>📄 CV yang Fit (Panduan & Sesi Meeting)</h3>
+          <p>Membantu membangun CV yang relevan dan menarik bagi perekrut melalui panduan otomatis + review personal.</p>
+          <ul>
+            <li>Template CV & panduan penulisan yang sesuai industri</li>
+            <li>Sesi review CV 1:1 via meeting (video/Zoom)</li>
+            <li>Simulasi ATS-check & rekomendasi kata kunci</li>
+          </ul>
+          <div class="feature-cta">
+            <button class="btn btn-primary" onclick="uploadCV()">Kirim CV untuk Review</button>
+            <button class="btn btn-secondary" onclick="bookReview('cv')">Jadwalkan Sesi Review</button>
+          </div>
+        </div>
+
+        <!-- Interview -->
+        <div class="feature-card">
+          <h3>🎤 Interview (Training & Tandem Meeting)</h3>
+          <p>Persiapan interview melalui pelatihan, mock-interview, dan sesi tandem bersama mentor.</p>
+          <ul>
+            <li>Pelatihan teknik interview & STAR method</li>
+            <li>Mock interview direkam & diberi feedback</li>
+            <li>Tandem meeting — sesi bersama mentor industri</li>
+          </ul>
+          <div class="feature-cta">
+            <button class="btn btn-primary" onclick="startInterviewTraining()">Mulai Training</button>
+            <button class="btn btn-secondary" onclick="bookSession('interview')">Jadwalkan Mock Interview</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expanded menu / layanan tambahan -->
+      <div class="services-extended">
+        <h3>Layanan Tambahan</h3>
+        <div class="services-list">
+          <div class="service-item">
+            <strong>Scheduler Terintegrasi</strong> — Integrasi kalender untuk booking sesi cepat (Google Calendar / iCal).
+          </div>
+          <div class="service-item">
+            <strong>Chat Aman dengan Konselor</strong> — Secure chat untuk diskusi sebelum/selama sesi.
+          </div>
+          <div class="service-item">
+            <strong>Progress Tracker</strong> — Dashboard perkembangan, milestone, dan rekomendasi langkah selanjutnya.
+          </div>
+          <div class="service-item">
+            <strong>Resource Library</strong> — Artikel, template CV, contoh jawaban interview, dan video tutorial.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section (after Features) -->
   <section id="about" class="about">
     <div class="container">
       <h2>About HRCOEG</h2>
@@ -51,32 +125,7 @@
     </div>
   </section>
 
-  <!-- Features Section -->
-  <section id="features" class="features">
-    <div class="container">
-      <h2>Features</h2>
-      <div class="feature-grid">
-        <div class="feature-card">
-          <h3>🎯 Smart Matching</h3>
-          <p>AI-powered matching between candidates and job opportunities.</p>
-        </div>
-        <div class="feature-card">
-          <h3>📱 Easy to Use</h3>
-          <p>Simple, intuitive interface designed for everyone.</p>
-        </div>
-        <div class="feature-card">
-          <h3>🚀 Fast Deployment</h3>
-          <p>Get matched with opportunities quickly.</p>
-        </div>
-        <div class="feature-card">
-          <h3>💼 Professional Network</h3>
-          <p>Build connections with industry professionals.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Contact Section -->
+  <!-- Contact Section (Get In Touch) -->
   <section id="contact" class="contact">
     <div class="container">
       <h2>Get In Touch</h2>
@@ -97,6 +146,26 @@
   </footer>
 
   <script src="script.js"></script>
+  <script>
+    // Placeholder JS handlers — implement in script.js / API
+    function startAssessment() {
+      alert('Memulai psikotes — implementasikan alur assessment.');
+    }
+    function bookDiscussion(type) {
+      alert('Buka scheduler untuk: ' + type);
+    }
+    function uploadCV() {
+      alert('Buka modal upload CV.');
+    }
+    function bookReview(type) {
+      alert('Jadwalkan sesi review: ' + type);
+    }
+    function startInterviewTraining() {
+      alert('Mulai training interview.');
+    }
+    function bookSession(type) {
+      alert('Jadwalkan sesi: ' + type);
+    }
+  </script>
 </body>
 </html>
-
