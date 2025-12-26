@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HRCOEG — Layanan Konseling</title>
+  <link rel="stylesheet" href="features-ui.css">
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>Fitur Konseling Karier</h1>
+      <p class="lead">Pilih layanan untuk meningkatkan peluang kerja: Psikotes, CV yang Fit, Interview.</p>
+    </header>
+
+    <section class="features-grid">
+      <article class="card" data-service="psikotes">
+        <h3>🧠 Psikotes</h3>
+        <p>Assessment singkat untuk mengetahui minat & kepribadian. Durasi ~15 menit.</p>
+        <div class="card-actions">
+          <button class="btn primary" data-action="start" data-service="psikotes">Mulai Psikotes</button>
+          <button class="btn" data-action="book" data-service="psikotes">Jadwalkan Pembahasan</button>
+        </div>
+      </article>
+
+      <article class="card" data-service="cv">
+        <h3>📄 CV yang Fit</h3>
+        <p>Template, ATS-check, dan sesi review 1:1 untuk membuat CV dilirik recruiter.</p>
+        <div class="card-actions">
+          <button class="btn primary" data-action="upload" data-service="cv">Kirim CV untuk Review</button>
+          <button class="btn" data-action="book" data-service="cv">Jadwalkan Sesi Review</button>
+        </div>
+      </article>
+
+      <article class="card" data-service="interview">
+        <h3>🎤 Interview</h3>
+        <p>Pelatihan teknik interview, mock interview terekam, dan tandem meeting dengan mentor.</p>
+        <div class="card-actions">
+          <button class="btn primary" data-action="start" data-service="interview">Mulai Training</button>
+          <button class="btn" data-action="book" data-service="interview">Jadwalkan Mock Interview</button>
+        </div>
+      </article>
+    </section>
+
+    <!-- Stepper / Modal area -->
+    <div id="panel" class="panel hidden" aria-hidden="true">
+      <div class="panel-content">
+        <button id="panelClose" class="panel-close" aria-label="close">×</button>
+        <div id="stepper">
+          <!-- step headers -->
+          <ol id="stepsHeader" class="steps-header"></ol>
+          <!-- step contents -->
+          <div id="stepsContainer" class="steps-container"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="features-ui.js"></script>
+</body>
+</html>
