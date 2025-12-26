@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "UserProfile": {
+      "type": "object",
+      "required": ["id", "name", "email", "role"],
+      "properties": {
+        "id": { "type": "string", "description": "UUID" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": ["string", "null"] },
+        "location": { "type": ["string", "null"] },
+        "role": { "type": "string", "enum": ["student", "freshgraduate", "jobseeker", "recruiter"] },
+        "university": { "type": ["string", "null"] },
+        "major": { "type": ["string", "null"] },
+        "gpa": { "type": ["number", "null"] },
+        "expected_graduation_year": { "type": ["integer", "null"] },
+        "linkedin": { "type": ["string", "null"], "format": "uri" },
+        "github": { "type": ["string", "null"], "format": "uri" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Education": {
+      "type": "object",
+      "required": ["id", "user_id", "institution", "major"],
+      "properties": {
+        "id": { "type": "string" },
+        "user_id": { "type": "string" },
+        "institution": { "type": "string" },
+        "major": { "type": "string" },
+        "start_year": { "type": ["integer", "null"] },
+        "end_year": { "type": ["integer", "null"] },
+        "gpa": { "type": ["number", "null"] }
+      }
+    },
+    "Experience": {
+      "type": "object",
+      "required": ["id", "user_id"],
+      "properties": {
+        "id": { "type": "string" },
+        "user_id": { "type": "string" },
+        "title": { "type": "string" },
+        "company": { "type": "string" },
+        "start_date": { "type": ["string", "null"], "format": "date" },
+        "end_date": { "type": ["string", "null"], "format": "date" },
+        "description": { "type": ["string", "null"] }
+      }
+    },
+    "Skill": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "level": { "type": "string", "enum": ["beginner", "intermediate", "advanced", "expert"] }
+      }
+    },
+    "CVUpload": {
+      "type": "object",
+      "required": ["id", "user_id", "filename", "storage_url", "uploaded_at"],
+      "properties": {
+        "id": { "type": "string" },
+        "user_id": { "type": "string" },
+        "filename": { "type": "string" },
+        "storage_url": { "type": "string", "format": "uri" },
+        "filesize_bytes": { "type": "integer" },
+        "uploaded_at": { "type": "string", "format": "date-time" },
+        "ats_score": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+        "keywords_matched": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "PsychTestResult": {
+      "type": "object",
+      "required": ["id", "user_id", "test_name", "started_at", "completed_at", "raw_answers", "scores"],
+      "properties": {
+        "id": { "type": "string" },
+        "user_id": { "type": "string" },
+        "test_name": { "type": "string" },
+        "version": { "type": "string" },
+        "started_at": { "type": "string", "format": "date-time" },
+        "completed_at": { "type": "string", "format": "date-time" },
+        "raw_answers": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "scores": {
+          "type": "object",
+          "description": "Computed scores, e.g. {\"extraversion\": 60, \"conscientiousness\": 72}"
+        },
+        "report_url": { "type": ["string", "null"], "format": "uri" }
+      }
+    },
+    "Booking": {
+      "type": "object",
+      "required": ["id", "user_id", "service", "start_time", "end_time", "status"],
+      "properties": {
+        "id": { "type": "string" },
+        "user_id": { "type": "string" },
+        "service": { "type": "string", "enum": ["psikotes_review", "cv_review", "mock_interview", "career_consult"] },
+        "provider_id": { "type": ["string", "null"], "description": "mentor/konselor id" },
+        "start_time": { "type": "string", "format": "date-time" },
+        "end_time": { "type": "string", "format": "date-time" },
+        "timezone": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled", "completed"] },
+        "created_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "SessionNote": {
+      "type": "object",
+      "required": ["id", "booking_id", "author_id", "content", "created_at"],
+      "properties": {
+        "id": { "type": "string" },
+        "booking_id": { "type": "string" },
+        "author_id": { "type": "string" },
+        "content": { "type": "string" },
+        "attachments": {
+          "type": "array",
+          "items": { "type": "string", "format": "uri" }
+        },
+        "created_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "EventLog": {
+      "type": "object",
+      "required": ["id", "user_id", "event_type", "occurred_at"],
+      "properties": {
+        "id": { "type": "string" },
+        "user_id": { "type": "string" },
+        "event_type": { "type": "string" },
+        "metadata": { "type": ["object", "null"] },
+        "occurred_at": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "type": "object",
+  "properties": {
+    "UserProfile": { "$ref": "#/definitions/UserProfile" },
+    "Education": { "$ref": "#/definitions/Education" },
+    "Experience": { "$ref": "#/definitions/Experience" },
+    "Skill": { "$ref": "#/definitions/Skill" },
+    "CVUpload": { "$ref": "#/definitions/CVUpload" },
+    "PsychTestResult": { "$ref": "#/definitions/PsychTestResult" },
+    "Booking": { "$ref": "#/definitions/Booking" },
+    "SessionNote": { "$ref": "#/definitions/SessionNote" },
+    "EventLog": { "$ref": "#/definitions/EventLog" }
+  }
+}
